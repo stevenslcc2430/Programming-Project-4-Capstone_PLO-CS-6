@@ -1,4 +1,5 @@
-mermaid ```
+```mermaid 
+
 classDiagram
     class Board {
         -posiitonNames: String[]
@@ -86,3 +87,5 @@ classDiagram
     Simulation "1" *-- "2" Deck : owns
     Driver ..> Simulation : creates
     Deck ..> Board : references for card destinations
+
+```
