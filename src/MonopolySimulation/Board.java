@@ -20,10 +20,18 @@ public class Board {
         "Free Parking", "Property", "Chance", "Property", "Property", "Railroad", "Property", "Property", "Utility", "Property",
         "Go To Jail", "Property", "Property", "Chest", "Property", "Railroad", "Chance", "Property", "Deposit", "Property"
     };
+    
     private int[] board = new int[40];
+    public final int GO_INDEX;
+    public final int JAIL_INDEX;
+    public final int GO_TO_JAIL_INDEX;
+    public final int NUM_SQUARES;
 
     public Board() {
-
+        GO_INDEX = 0;
+        JAIL_INDEX = 10;
+        GO_TO_JAIL_INDEX = 30;
+        NUM_SQUARES = 40;
     }
 
     public String getSquareName(int index) {
