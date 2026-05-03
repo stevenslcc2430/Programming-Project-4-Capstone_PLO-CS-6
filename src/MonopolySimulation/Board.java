@@ -38,6 +38,9 @@ public class Board {
     private int chestStackIndex;
     private int chanceStackIndex;
 
+    private boolean inJail;
+    private int jailFreeCards;
+
     public Board() {
 
         // Chance card deck implementation
@@ -46,9 +49,9 @@ public class Board {
         chanceCards.add(p -> 24); // Advance to Illinois Avenue
         chanceCards.add(p -> 11); // Advance to St. Charles Palace
         chanceCards.add(p -> p);  // Bank pays you dividend of $50
-        chanceCards.add(p -> p);  // Get Out of Jail Free
+        chanceCards.add(p -> {jailFreeCards++; return p;});  // Get Out of Jail Free
         chanceCards.add(p -> (p - 3) % 40); // Go Back 3 Spaces
-        chanceCards.add(p -> 10); // Go to Jail
+        chanceCards.add(p -> {inJail = true; return 10;}); // Go to Jail
         chanceCards.add(p -> p);  // Make general repairs on all your property
         chanceCards.add(p -> p);  // Speeding fine
         chanceCards.add(p -> 5);  // Take a trip to Reading Railroad
@@ -70,8 +73,8 @@ public class Board {
         chestCards.add(p -> p);  // Bank error in your favor
         chestCards.add(p -> p);  // Doctor's fee
         chestCards.add(p -> p);  // From sales of stock you get $50
-        chestCards.add(p -> p);  // Get Out of Jail Free
-        chestCards.add(p -> 10); // Go to Jail
+        chestCards.add(p -> {jailFreeCards++; return p;});  // Get Out of Jail Free
+        chestCards.add(p -> {inJail = true; return 10;}); // Go to Jail
         chestCards.add(p -> p);  // Holiday fund matures
         chestCards.add(p -> p);  // Income tax refund
         chestCards.add(p -> p);  // It is your birthday
@@ -98,12 +101,17 @@ public class Board {
         int num2 = rand.nextInt(1, 7);
         int roll = num1 + num2;
 
-        // Check for doubles
-        if (num1 == num2 && ++consecutiveRolls == 3) {
+        // Check for doubles & jail
+        if (inJail && jailFreeCards > 0) {
+            jailFreeCards--;
+            inJail = false;
+        } else if (num1 == num2 && inJail) {
+            inJail = false;
+        } else if (num1 == num2 && ++consecutiveRolls == 3) {
 
             position = 10;
+            inJail = true;
             board[position]++;
-
             return;
         }
 
