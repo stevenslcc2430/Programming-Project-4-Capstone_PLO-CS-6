@@ -6,6 +6,8 @@ Julian Cloward, Steven Benjamin, Theodore Tran
 CS-2430-502 Spring 2026
 Programming Project 4
 
+Contains the two different decks of cards and allows 
+for drawing and discarding.
 @author Julian Cloward
 *****************************************************/
 
@@ -23,27 +25,33 @@ public class Deck {
     private int chestStackIndex;
     private int chanceStackIndex;
 
+    public int GET_OUT_OF_JAIL;
+    public int NO_MOVE;
+
     private Board board;
 
     public Deck(Board board) {
         this.board = board;
 
-        buildChestCards(board);
+        buildChestCards();
         
-        BuildChanceCards();
+        buildChanceCards();
 
         // Shuffle decks
         Collections.shuffle(chanceCards);
         Collections.shuffle(chestCards);
     }
 
-    private void BuildChanceCards() {
+    /**
+     * Builds the chestCards list including int manipulation for position after card affect.
+     */
+    private void buildChestCards() {
         // Chest card deck implementation
         chestCards.add(p -> 0);  // Advance to GO
         chestCards.add(p -> p);  // Bank error in your favor
         chestCards.add(p -> p);  // Doctor's fee
         chestCards.add(p -> p);  // From sales of stock you get $50
-        chestCards.add(p -> p);  // Get Out of Jail Free
+        chestCards.add(p -> {GET_OUT_OF_JAIL--;return p;});  // Get Out of Jail Free
         chestCards.add(p -> 10); // Go to Jail
         chestCards.add(p -> p);  // Holiday fund matures
         chestCards.add(p -> p);  // Income tax refund
@@ -57,14 +65,17 @@ public class Deck {
         chestCards.add(p -> p);  // You inherit $100
     }
 
-    private void buildChestCards(Board board) {
+    /**
+     * Creates the chanceCards list and includes data manipulation
+     */
+    private void buildChanceCards() {
         // Chance card deck implementation
         chanceCards.add(p -> 39); // Advance to Boardwalk
         chanceCards.add(p ->  0); // Advance to GO
         chanceCards.add(p -> 24); // Advance to Illinois Avenue
         chanceCards.add(p -> 11); // Advance to St. Charles Palace
         chanceCards.add(p -> p);  // Bank pays you dividend of $50
-        chanceCards.add(p -> {return p;});  // Get Out of Jail Free
+        chanceCards.add(p -> {GET_OUT_OF_JAIL--;return p;});  // Get Out of Jail Free
         chanceCards.add(p -> (p - 3) % 40); // Go Back 3 Spaces
         chanceCards.add(p -> {return 10;}); // Go to Jail
         chanceCards.add(p -> p);  // Make general repairs on all your property
@@ -83,7 +94,13 @@ public class Deck {
             return pos - 1;
         });
     }
-
+    
+    /**
+     * Draws a card if the current position is either a Chest space or a Chance space and returns the next position.
+     * 
+     * @param currentPosition   The current position of the player
+     * @return The resulting location for the player after the card has been drawn or no card was drawn.
+     */
     public int draw(int currentPosition) {
         if (board.getSquareName(currentPosition).equals("Chest")) {
             card = chestCards.get(chestStackIndex++);
@@ -99,7 +116,7 @@ public class Deck {
                 Collections.shuffle(chestCards);
             }
         }
-        return 1;
+        return card.applyAsInt(currentPosition);
     }
 
     public IntUnaryOperator returnCard() {
